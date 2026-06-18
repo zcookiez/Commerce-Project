@@ -40,7 +40,7 @@ public class CommerceSystem {
         do {
             product = selectItemFromMenu(
                     sc,
-                    "[ " + category.toString()+ " 카테고리 ]",
+                    "[ " + category.getCategory()+ " 카테고리 ]",
                     category.getProducts(),
                     exitStr
             );
