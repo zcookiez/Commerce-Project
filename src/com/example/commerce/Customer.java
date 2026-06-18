@@ -4,10 +4,10 @@ public class Customer {
     // 필드
     private String customerName;
     private String email;
-    private int rank;
+    private String rank;
 
     // 생성자
-    public Customer(String customerName, String email, int rank) {
+    public Customer(String customerName, String email, String rank) {
         this.customerName = customerName;
         this.email = email;
         this.rank = rank;
@@ -20,7 +20,7 @@ public class Customer {
     public String getEmail() {
         return email;
     }
-    public int getRank() {
+    public String getRank() {
         return rank;
     }
     public void setCustomerName(String customerName) {
@@ -29,7 +29,7 @@ public class Customer {
     public void setEmail(String email) {
         this.email = email;
     }
-    public void setRank(int rank) {
+    public void setRank(String rank) {
         this.rank = rank;
     }
 }
