@@ -74,11 +74,13 @@ public class Product {
 
         sb.append("\n==============================================\n");
         sb.append("🔍 [상품 상세 정보]\n");
-        sb.append("- 상품명  : ").append(this.name).append("\n");
-        sb.append("- 가격    : ").append(String.format("%,d원", this.price)).append("\n");
-        sb.append("- 설명    : ").append(this.description).append("\n");
-        sb.append("- 📦재고  : ").append(this.stockQuantity).append("개\n");
+        sb.append("- 🔖상품명 : ").append(this.name).append("\n");
+        sb.append("- 💵가격   : ").append(String.format("%,d원", this.price)).append("\n");
+        sb.append("- 📝설명   : ").append(this.description).append("\n");
+        sb.append("- 📦재고   : ").append(this.stockQuantity).append("개\n");
         sb.append("==============================================");
+        sb.append("\n🛒 위 상품을 장바구니에 추가하시겠습니까?\n");
+        sb.append("1. 확인        2. 취소");
 
         return sb.toString(); // 완성된 하나의 전체 문자열을 반환
     }
