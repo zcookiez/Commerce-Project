@@ -53,7 +53,7 @@
   - `printDetail()`, `toString()` (상품 스펙을 줄 맞춰 포맷팅 출력)
 - **연관 관계**: 카테고리([Category](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/Category.java))의 관리 품목 리스트에 포함되어 소속됩니다.
 
-### 🛒 [Cart](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/Cart.java) (장바구니 계산기)
+### 🛒 [Cart](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/Cart.java) (장바구니)
 - **담당 역할**: 사용자가 담은 품목 목록을 캡슐화(숨겨둠)하여 보관하며, 중복 추가 검사 및 합산 결제액을 계산합니다.
 - **주요 속성**: `items` (장바구니에 담긴 세부 품목 리스트)
 - **핵심 메서드**: 
