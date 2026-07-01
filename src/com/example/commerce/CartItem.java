@@ -1,6 +1,6 @@
 package com.example.commerce;
 
-public class CartItem {
+public class CartItem implements Printable{
     private String productName;  // 상품명
     private int price;           // 상품 가격 (질문하신 개당 가격!)
     private int quantity;        // 수량
@@ -29,7 +29,7 @@ public class CartItem {
     }
 
     @Override
-    public String toString() {
+    public String printFormat() {
         int itemTotalPrice = this.price * this.quantity;
         return String.format("%-15s | %,10d원 | %5d개 | %,12d원",
                 productName, price, quantity, itemTotalPrice);

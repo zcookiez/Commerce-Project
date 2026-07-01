@@ -2,7 +2,7 @@ package com.example.commerce;
 
 import java.text.DecimalFormat;
 
-public class Product {
+public class Product implements Printable{
     // 필드
     private String name;        // 상품명
     private int price;          // 가격
@@ -55,9 +55,10 @@ public class Product {
         }
     }
 
+
     /*상품 출력*/
     @Override
-    public String toString() {
+    public String printFormat() {
         // 1. 가격을 천 단위 쉼표 형태로 포맷팅 (예: 1200000 -> 1,200,000)
         DecimalFormat df = new DecimalFormat("#,###");
         String formattedPrice = df.format(price) + "원";
@@ -83,6 +84,7 @@ public class Product {
 
         return sb.toString(); // 완성된 하나의 전체 문자열을 반환
     }
+
 
 
 }

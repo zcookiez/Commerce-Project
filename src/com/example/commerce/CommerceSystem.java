@@ -22,19 +22,18 @@ public class CommerceSystem {
         String cancel = "주문 취소";
         String admin = "관리자 모드";
 
-        Category selectedCategory;
+        Printable selectedCategory;
 
         do {
-            List<Category> menuList = new ArrayList<>(this.categories);
+            List<Printable> menuList = new ArrayList<>(this.categories);
 
             // 카트가 비어있지 않을 때 장바구니 확인, 주문 취소 카테고리 추가
             if (!cart.isEmpty()) {
-                menuList.add(new Category(confirm, new ArrayList<>()));
-                menuList.add(new Category(cancel, new ArrayList<>()));
+                menuList.add(new MenuOption(confirm));
+                menuList.add(new MenuOption(cancel));
             }
-
             // 관리자 카테고리 추가
-            menuList.add(new Category(admin, new ArrayList<>()));
+            menuList.add(new MenuOption(admin));
 
             // 카테고리 메뉴 출력
             selectedCategory = selectItemFromMenu(
@@ -45,14 +44,15 @@ public class CommerceSystem {
 
             // 커머스 카테고리
             if (selectedCategory != null) {
-                /*주문 확인*/
-                if(selectedCategory.getCategory().equals(confirm)) order();
-                /*주문 취소*/
-                else if(selectedCategory.getCategory().equals(cancel)) cart.clear("주문 취소로 장바구니를 모두 비웠습니다.");
-                /*관리자 모드*/
-                else if(selectedCategory.getCategory().equals(admin))  checkAdmin();
-                /*상품 카테고리*/
-                else runProductMenu(selectedCategory);
+                if (selectedCategory instanceof Category) {
+                    runProductMenu((Category) selectedCategory);
+                } else if (selectedCategory instanceof MenuOption) {
+                    String menuName = ((MenuOption) selectedCategory).getMenuName();
+                    if (menuName.equals(confirm)) order();
+                    if (menuName.equals(cancel)) cart.clear("주문 취소로 장바구니를 모두 비웠습니다.");
+                    if (menuName.equals(admin))  checkAdmin();
+                }
+
             }
         } while (selectedCategory != null);
         System.out.println("※ 커머스 플랫폼을 종료합니다.");
@@ -90,9 +90,14 @@ public class CommerceSystem {
         String delete = "상품 삭제";
         String showAll = "전체 상품 현황";
 
-        List<String> adminMenus = List.of(add, update, delete, showAll);
+        List<MenuOption> adminMenus = List.of(
+                new MenuOption(add),
+                new MenuOption(update),
+                new MenuOption(delete),
+                new MenuOption(showAll)
+        );
 
-        String selectedMenu;
+        MenuOption selectedMenu;
         do {
             selectedMenu = selectItemFromMenu(
                     "[ 🛠️ 관리자 전용 모드 ]",
@@ -101,10 +106,12 @@ public class CommerceSystem {
             );
 
             if (selectedMenu != null) {
-                if(selectedMenu.equals(add)) addProduct();
-                else if(selectedMenu.equals(update)) updateProduct();
-                else if(selectedMenu.equals(delete))  deleteProduct();
-                else if(selectedMenu.equals(showAll))  showAllProducts();
+                String menuName = selectedMenu.getMenuName();
+
+                if(menuName.equals(add)) addProduct();
+                else if(menuName.equals(update)) updateProduct();
+                else if(menuName.equals(delete))  deleteProduct();
+                else if(menuName.equals(showAll))  showAllProducts();
                 else System.out.println("❌ 잘못된 메뉴 선택입니다. 다시 선택해 주세요.");
             }
         } while (selectedMenu != null);
@@ -118,15 +125,14 @@ public class CommerceSystem {
             return;
         }
 
-        // 💡 길었던 추가 로직 삭제! cart 객체에게 책임을 완벽히 위임합니다.
         cart.addProduct(product);
-        cart.print();
+        System.out.println(cart.getReceipt());
     }
 
     /* 장바구니 주문 확정*/
     private void order(){
         System.out.println("\n\n😊아래와 같이 주문 하시겠습니까?");
-        cart.print(); // 💡 cart에게 출력 명령
+        System.out.println(cart.getReceipt());
         System.out.println("1. 주문 확정        2. 메인으로 돌아가기\n");
         int choice = inputNum("👉 번호를 입력해주세요 : ");
 
@@ -192,21 +198,23 @@ public class CommerceSystem {
 
 
         // 3. 선택된 상품의 수정할 항목 선택
-        List<String> updateMenus = List.of(
-                "가격",
-                "설명",
-                "재고수량"
+        List<MenuOption> updateMenus = List.of(
+                new MenuOption("가격"),
+                new MenuOption("설명"),
+                new MenuOption("재고수량")
         );
 
-        String selectedField = selectItemFromMenu(
+        MenuOption selectedField = selectItemFromMenu(
                 "[ 🛠️ 상품 정보 수정 ]"
                 , updateMenus
                 , "0. 뒤로가기"
         );
         if (selectedField == null) return;
 
+        String fieldName = selectedField.getMenuName();
+
         // 4. 항목 수정
-        switch (selectedField) {
+        switch (fieldName) {
             case "가격" -> {
                 int newPrice = inputNum("💵 새로운 가격을 입력해주세요: ");
                 selectedProduct.setPrice(newPrice);
@@ -267,25 +275,25 @@ public class CommerceSystem {
     /*전체 상품 출력*/
     private void showAllProducts() {
         System.out.println("\n📊 전체 상품 현황을 출력합니다.");
-        for(Category category : this.categories) {
+
+        this.categories.forEach(category -> {
             System.out.println("\n📌 " + category.getCategory());
             System.out.println("--------------------------------------------");
-            for(Product product : category.getProducts()){
-                System.out.println(product.toString());
-            }
+            category.getProducts().stream()
+                    .map(Product::printFormat)
+                    .forEach(System.out::println);
             System.out.println("=============================================");
-        }
+        });
     }
-
     /*CommerceSystem 제네릭 메서드*/
-    private <T> T selectItemFromMenu(String title, List<T> list, String text) {
+    private <T extends Printable> T selectItemFromMenu(String title, List<T> list, String text) {
         while (true) {
             System.out.println("\n" + title);
 
             // 1. 목록  출력
             int index = 1;
             for (T item : list) {
-                System.out.println(index++ + ". " + item.toString());
+                System.out.println(index++ + ". " + item.printFormat());
             }
             System.out.println(text);
 
@@ -306,14 +314,12 @@ public class CommerceSystem {
 
     /*상품 재고 확인*/
     private boolean checkFinalStock() {
-        // 💡 장바구니 내부의 알맹이(CartItem)들을 꺼내서 확인
-        for (CartItem cartItem : cart.getItems()) {
-            Product product = findProductByName(cartItem.getProductName());
-            if (product != null && product.getStockQuantity() < cartItem.getQuantity()) {
-                return false;
-            }
-        }
-        return true;
+        // noneMatch: 아래 조건(재고가 부족함)에 일치하는 항목이 "단 하나도 없어야" true를 반환
+        return cart.getItems().stream()
+                .noneMatch(cartItem -> {
+                    Product product = findProductByName(cartItem.getProductName());
+                    return product != null && product.getStockQuantity() < cartItem.getQuantity();
+                });
     }
 
     /*상품 재고 차감*/

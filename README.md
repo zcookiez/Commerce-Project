@@ -19,15 +19,18 @@
 
 # 2. 클래스 구조 및 역할
 
-프로그램을 구성하는 7개 클래스의 핵심 역할, 주요 속성, 메서드 및 관계를 보기 좋게 요약한 명세 리스트
-
----
-
 ### 🚀 [Main](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/Main.java) (프로그램 시작점)
 - **담당 역할**: 초기 카테고리와 상품 리스트를 등록하고 프로그램을 최초 가동합니다.
 - **주요 속성**: 없음
 - **핵심 메서드**: `main()` (기본 데이터 구성 및 쇼핑몰 구동 시작)
 - **연관 관계**: [CommerceSystem](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/CommerceSystem.java)을 생성 및 실행합니다.
+
+### 🖨️ [Printable](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/Printable.java) (메뉴 출력용 다형성 인터페이스)
+- **담당 역할**: 콘솔 화면에 메뉴 목록(카테고리, 상품, 일반 메뉴 등)을 출력할 때 통일된 규격을 제공하기 위한
+  인터페이스입니다.
+- **핵심 메서드**: `printFormat()` (콘솔에 출력될 형식화된 문자열 반환)
+- **연관 관계**: `Category`, `Product`, `MenuOption` 클래스가 이 인터페이스를 구현(implements)하여 다형성을
+  활용합니다.
 
 ### ⚙️ [CommerceSystem](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/CommerceSystem.java) (화면 제어 및 전체 조율)
 - **담당 역할**: 쇼핑몰 메인 콘솔의 입출력 화면을 제어하고 전체 흐름 및 관리자 모드를 관리합니다.
@@ -37,7 +40,16 @@
   - `order()`, `checkFinalStock()`, `deductStock()` (주문 확정 및 재고 차감 처리)
   - `addProduct()`, `updateProduct()`, `deleteProduct()`, `showAllProducts()` (관리자용 상품 변경 기능)
   - `checkAdmin()`, `findProductByName()`, `inputNum()`, `inputStr()` (인증 및 안전 입력 제어 유틸)
+  - `selectItemFromMenu()`: 제네릭(`<T extends Printable>`)을 활용하여 카테고리, 상품, 일반 메뉴의 출력과 사용자
+   선택 입력을 하나의 메서드로 통합 처리합니다.
 - **연관 관계**: 장바구니([Cart](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/Cart.java))와 카테고리 목록([Category](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/Category.java))을 소유하고 조율합니다.
+
+### 🔘 [MenuOption](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/MenuOption.java) (일반 메뉴 항목)
+- **담당 역할**: "관리자 모드", "장바구니 확인"과 같은 일반 메뉴 선택지를 객체화합니다.
+- **주요 속성**: `menuName` (메뉴 이름)
+- **핵심 메서드**: `getMenuName()`, `printFormat()`
+- **연관 관계**: `Printable` 인터페이스를 구현하여, 상품 카테고리와 함께 동일한 메뉴 리스트(`List<Printable>`)에
+  담길 수 있도록 합니다.
 
 ### 🏷️ [Category](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/Category.java) (상품 분류 박스)
 - **담당 역할**: 카테고리 정보와 그 하위에 소속된 상품들의 리스트를 묶어서 관리합니다.
@@ -50,23 +62,26 @@
 - **주요 속성**: `name` (상품명), `price` (가격), `description` (설명), `stockQuantity` (매장 내 실재고 수량)
 - **핵심 메서드**: 
   - `setPrice()`, `setStockQuantity()` (금액 및 재고 변경 시 음수를 0으로 강제하는 검증 처리)
-  - `printDetail()`, `toString()` (상품 스펙을 줄 맞춰 포맷팅 출력)
+  - `printDetail()`, `printFormat()` (상품 스펙을 줄 맞춰 포맷팅 출력)
 - **연관 관계**: 카테고리([Category](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/Category.java))의 관리 품목 리스트에 포함되어 소속됩니다.
+- 콘솔 메뉴 출력을 위해  Printable  인터페이스를 구현하고 있습니다. 
 
 ### 🛒 [Cart](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/Cart.java) (장바구니)
 - **담당 역할**: 사용자가 담은 품목 목록을 캡슐화(숨겨둠)하여 보관하며, 중복 추가 검사 및 합산 결제액을 계산합니다.
 - **주요 속성**: `items` (장바구니에 담긴 세부 품목 리스트)
 - **핵심 메서드**: 
   - `addProduct()` (담으려는 상품의 중복 유무를 판별해 새로 추가하거나 수량을 가산함)
-  - `print()` (현재 담긴 품목들과 총 청구 결제 금액을 계산하여 서식화 출력)
+  - `getReceipt()` (현재 담긴 품목들과 총 청구 결제 금액을 계산하여 서식화 출력)
   - `clear()` (주문 완료 및 취소에 따른 카트 청소), `removeByProductName()` (상품 삭제 시 카트에서도 자동 삭제)
+  - `getTotalPrice()` (장바구니 내 품목의 총 청구 결제 금액을 계산함)
 - **연관 관계**: 다수의 장바구니 개별 아이템([CartItem](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/CartItem.java))들을 소유하여 제어합니다.
 
 ### 📝 [CartItem](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/CartItem.java) (장바구니 개별 품목)
 - **담당 역할**: 장바구니에 담긴 특정 상품의 명칭, 담긴 당시의 단가, 사용자가 지정한 수량만을 추려서 기억합니다.
 - **주요 속성**: `productName` (상품명), `price` (단가), `quantity` (담은 개수)
-- **핵심 메서드**: `addQuantity()` (장바구니 안에서 수량이 늘어날 시 누적 가산), `toString()` (품목별 중간 가격 계산 출력)
+- **핵심 메서드**: `addQuantity()` (장바구니 안에서 수량이 늘어날 시 누적 가산), `printFormat()` (품목별 중간 가격 계산 출력)
 - **연관 관계**: 장바구니([Cart](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/Cart.java)) 내부 리스트에 적재되어 존재합니다.
+- 영수증 내 항목 출력을 위해 `Printable` 인터페이스를 구현하고 있습니다.
 
 ### 👤 [Customer](file:///C:/Practice_3/CommerceProject/src/com/example/commerce/Customer.java) (이용자 정보 보관)
 - **담당 역할**: 이용 손님의 신원 정보(이름, 이메일, 회원등급)를 보관하는 정보 바구니입니다.

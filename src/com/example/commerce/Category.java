@@ -2,7 +2,7 @@ package com.example.commerce;
 
 import java.util.List;
 
-public class Category {
+public class Category implements Printable{
 
     // 필드
     private String category; // 카테고리명
@@ -41,7 +41,7 @@ public class Category {
     }
 
     @Override
-    public String toString() {
+    public String printFormat() {
         return this.category;
     }
 }
